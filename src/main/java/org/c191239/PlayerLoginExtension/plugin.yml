@@ -1,0 +1,15 @@
+name: PlayerLoginExtension
+version: 1.0.0-SNAPSHOT
+main: org.c191239.PlayerLoginExtension.Main
+description: A plugin to allow players to register and login with a password on a Minecraft server.
+author: C191239
+api-version: 1.17
+commands:
+  register:
+    description: Set your password for the first time.
+    usage: /register <password> <confirm password>
+    aliases: reg
+  login:
+    description: Login the server with your password.
+    usage: /login <password>
+    aliases: l

@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="PlayerLoginExtension:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/PlayerLoginExtension_jar</output-path>
+    <root id="archive" name="PlayerLoginExtension.jar">
+      <element id="module-output" name="PlayerLoginExtension" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/java/org/c191239/PlayerLoginExtension/plugin.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/java/org/c191239/PlayerLoginExtension/config.yml" />
+      <element id="directory" name="META-INF">
+        <element id="dir-copy" path="$PROJECT_DIR$/src/main/java/META-INF" />
+      </element>
+    </root>
+  </artifact>
+</component>
