@@ -31,6 +31,7 @@ public class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new EventProcessor(), this);
         Objects.requireNonNull(Bukkit.getPluginCommand("register")).setExecutor(new RegisterCommandHandler());
         Objects.requireNonNull(Bukkit.getPluginCommand("login")).setExecutor(new LoginCommandHandler());
+        Objects.requireNonNull(Bukkit.getPluginCommand("changepassword")).setExecutor(new ChangePasswordCommandHandler());
         log("§3Player Login Extension enabled successfully.");
     }
 
@@ -52,7 +53,7 @@ public class Main extends JavaPlugin {
 }
 
 
- final class EventProcessor implements Listener{
+final class EventProcessor implements Listener{
     public void cancelAndInformIfNotLoggedIn(Cancellable c){
         if (c instanceof PlayerEvent){
             if (PlayerNotLoginQuery.verifyPlayer(((PlayerEvent) c).getPlayer())){
@@ -117,7 +118,7 @@ public class Main extends JavaPlugin {
     }
 
     @EventHandler
-     public void onPlayerQuit(PlayerQuitEvent e){
+    public void onPlayerQuit(PlayerQuitEvent e){
         PlayerNotLoginQuery.removePlayer(e.getPlayer());
     }
 }
@@ -135,7 +136,7 @@ final class PlayerPasswordQuery {
         config.set(p.getUniqueId().toString(), String.valueOf(pwd.hashCode()));
         Main.self.saveConfig();
     }
-        }
+}
 
 final class PlayerNotLoginQuery {
     private static final List<String> playerNotLoginList = new ArrayList<>();
@@ -192,7 +193,7 @@ final class RegisterCommandHandler implements CommandExecutor{
         } else if (PlayerNotLoginQuery.verifyPlayer((Player) commandSender)) {
             if (strings[0].equals(strings[1])){
                 PlayerPasswordQuery.registerPlayer((Player) commandSender, strings[0]);
-                commandSender.sendMessage(ChatColor.GREEN+"Congratulations! You registered successfully.");
+                commandSender.sendMessage(ChatColor.GREEN+"Congratulations! You have registered successfully.");
             } else {
                 commandSender.sendMessage(ChatColor.RED+"Please confirm your password.");
             }
@@ -201,5 +202,32 @@ final class RegisterCommandHandler implements CommandExecutor{
             commandSender.sendMessage(ChatColor.AQUA+"How do you login but not register at the same time?");
             return true;
         }
+    }
+}
+
+final class ChangePasswordCommandHandler implements CommandExecutor{
+    @Override
+    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+        if (!(commandSender instanceof Player)){
+            return false;
+        }
+        if (strings.length != 3) {
+            return false;
+        }
+        if (PlayerPasswordQuery.isPlayerRegistered((Player) commandSender)){
+            if (PlayerPasswordQuery.verifyPassword((Player) commandSender, strings[0])){
+                if (strings[1].equals(strings[2])){
+                    PlayerPasswordQuery.registerPlayer((Player) commandSender, strings[1]);
+                    commandSender.sendMessage(ChatColor.GREEN+"Congratulations! You have changed your password successfully.");
+                } else {
+                    commandSender.sendMessage(ChatColor.RED+"Please confirm your new password.");
+                }
+            } else {
+                commandSender.sendMessage(ChatColor.RED+"Your old password is wrong. Please try again.");
+            }
+        } else {
+            commandSender.sendMessage(ChatColor.RED+"You have not registered yet. Type /reg <password> <confirm password> to register.");
+        }
+        return true;
     }
 }
