@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -58,24 +59,33 @@ final class EventProcessor implements Listener{
         if (c instanceof PlayerEvent){
             if (PlayerNotLoginQuery.verifyPlayer(((PlayerEvent) c).getPlayer())){
                 c.setCancelled(true);
-                if (PlayerNotLoginQuery.verifyPlayer(((PlayerEvent) c).getPlayer())){
-                    if (PlayerPasswordQuery.isPlayerRegistered(((PlayerEvent) c).getPlayer())){
-                        ((PlayerEvent) c).getPlayer().sendMessage(ChatColor.GOLD+"Type /l <password> to login.");
-                    } else {
-                        ((PlayerEvent) c).getPlayer().sendMessage(ChatColor.GOLD+"Type /reg <password> <confirm password> to register.");
-                    }
+                if (PlayerPasswordQuery.isPlayerRegistered(((PlayerEvent) c).getPlayer())){
+                    ((PlayerEvent) c).getPlayer().sendMessage(ChatColor.GOLD+"Type /l <password> to login.");
+                } else {
+                    ((PlayerEvent) c).getPlayer().sendMessage(ChatColor.GOLD+"Type /reg <password> <confirm password> to register.");
                 }
             }
         } else if (c instanceof InventoryOpenEvent) {
             if (PlayerNotLoginQuery.verifyPlayer((Player) ((InventoryOpenEvent) c).getPlayer())){
                 c.setCancelled(true);
-                if (PlayerNotLoginQuery.verifyPlayer((Player) ((InventoryOpenEvent) c).getPlayer())){
-                    if (PlayerPasswordQuery.isPlayerRegistered((Player) ((InventoryOpenEvent) c).getPlayer())){
-                        ((InventoryOpenEvent) c).getPlayer().sendMessage(ChatColor.GOLD+"Type /l <password> to login.");
+                if (PlayerPasswordQuery.isPlayerRegistered((Player) ((InventoryOpenEvent) c).getPlayer())){
+                    ((InventoryOpenEvent) c).getPlayer().sendMessage(ChatColor.GOLD+"Type /l <password> to login.");
+                } else {
+                    ((InventoryOpenEvent) c).getPlayer().sendMessage(ChatColor.GOLD+"Type /reg <password> <confirm password> to register.");
+                }
+            }
+        } else if (c instanceof EntityDamageEvent){
+            if (((EntityDamageEvent) c).getEntity() instanceof Player){
+                if (PlayerNotLoginQuery.verifyPlayer((Player) ((EntityDamageEvent) c).getEntity())){
+                    c.setCancelled(true);
+                    if (PlayerPasswordQuery.isPlayerRegistered((Player) ((EntityDamageEvent) c).getEntity())){
+                        ((EntityDamageEvent) c).getEntity().sendMessage(ChatColor.GOLD+"Type /l <password> to login.");
                     } else {
-                        ((InventoryOpenEvent) c).getPlayer().sendMessage(ChatColor.GOLD+"Type /reg <password> <confirm password> to register.");
+                        ((EntityDamageEvent) c).getEntity().sendMessage(ChatColor.GOLD+"Type /reg <password> <confirm password> to register.");
                     }
                 }
+            } else {
+                c.setCancelled(false);
             }
         } else {
             c.setCancelled(false);
@@ -120,6 +130,11 @@ final class EventProcessor implements Listener{
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
         PlayerNotLoginQuery.removePlayer(e.getPlayer());
+    }
+
+    @EventHandler
+    public void preventHurt(EntityDamageEvent e){
+        cancelAndInformIfNotLoggedIn(e);
     }
 }
 
